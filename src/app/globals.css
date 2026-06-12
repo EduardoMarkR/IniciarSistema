@@ -1,26 +1,324 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #030008;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+button {
+  font: inherit;
+}
+
+.page {
+  min-height: 100svh;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 43, 214, 0.22), transparent 35%),
+    linear-gradient(135deg, #050014, #09001f 45%, #000);
+  color: #fff;
   font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.page.danger {
+  background:
+    radial-gradient(circle at center, rgba(255, 0, 0, 0.25), transparent 38%),
+    linear-gradient(135deg, #120000, #060000, #000);
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.08) 0px,
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+.card,
+.letterCard {
+  width: min(100%, 430px);
+  max-height: calc(100svh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid rgba(255, 122, 221, 0.45);
+  border-radius: 28px;
+  padding: 28px 22px;
+  background: rgba(0, 0, 0, 0.64);
+  box-shadow:
+    0 0 40px rgba(255, 43, 214, 0.25),
+    inset 0 0 22px rgba(255, 43, 214, 0.08);
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 1;
+}
+
+.center {
+  text-align: center;
+}
+
+.tag {
+  color: #ff7add;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.red {
+  color: #ff4b4b;
+}
+
+h1 {
+  margin: 14px 0 8px;
+  font-size: clamp(30px, 10vw, 58px);
+  line-height: 1;
+  color: #ff7add;
+  text-shadow: 0 0 18px rgba(255, 122, 221, 0.75);
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+h2 {
+  margin: 0 0 22px;
+  color: #9dff7a;
+  font-size: 18px;
+}
+
+.version {
+  color: #ffc3ee;
+  margin: 0 0 28px;
+  font-size: 22px;
+}
+
+.text {
+  color: #f6dff2;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+button {
+  margin-top: 22px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  padding: 16px 18px;
+  color: #fff;
+  background: linear-gradient(90deg, #ff2bd6, #8b5cf6);
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 0 28px rgba(255, 43, 214, 0.55);
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.terminal {
+  font-family: "Courier New", monospace;
+}
+
+.line {
+  opacity: 0;
+  color: #9dff7a;
+  font-size: 14px;
+  line-height: 1.55;
+  animation: appear 0.45s forwards;
+}
+
+.line.show {
+  opacity: 1;
+  animation: none;
+}
+
+.progress {
+  margin: 26px 0;
+  height: 18px;
+  padding: 3px;
+  border: 1px solid #9dff7a;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: repeating-linear-gradient(
+    to right,
+    #9dff7a 0px,
+    #9dff7a 10px,
+    transparent 10px,
+    transparent 14px
+  );
+  animation: load 6.8s forwards;
+}
+
+.progress.complete span {
+  animation: none;
+  width: 100%;
+}
+
+.heart {
+  color: #9dff7a;
+  text-align: center;
+  font-size: 12px;
+}
+
+.warning {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 20px;
+  border: 3px solid #ff4b4b;
+  border-radius: 24px;
+  color: #ff4b4b;
+  font-size: 64px;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  text-shadow: 0 0 18px rgba(255, 75, 75, 0.8);
+}
+
+.errorScreen h1 {
+  color: #ff4b4b;
+  text-shadow: 0 0 22px rgba(255, 75, 75, 0.8);
+}
+
+.love {
+  font-size: clamp(28px, 10vw, 46px);
+}
+
+.alertBox {
+  margin-top: 26px;
+  border: 1px solid #ff4b4b;
+  color: #ff4b4b;
+  border-radius: 16px;
+  padding: 18px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.delayedAlert {
+  opacity: 0;
+  animation: appear 0.5s forwards;
+  animation-delay: 8s;
+}
+
+.bigHeart,
+.lock {
+  font-size: 54px;
+  text-align: center;
+  color: #ff7add;
+  text-shadow: 0 0 20px rgba(255, 122, 221, 0.8);
+}
+
+.unlockCard {
+  width: min(100%, 430px);
+}
+
+#unlockTitle {
+  font-size: clamp(25px, 8.2vw, 40px);
+  line-height: 1.08;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.letterCard {
+  width: min(100%, 470px);
+  padding: 28px 22px 34px;
+}
+
+.letterText {
+  margin-top: 20px;
+}
+
+.letterText p {
+  color: #fff2fb;
+  font-size: 16px;
+  line-height: 1.72;
+  margin: 0 0 18px;
+}
+
+.letterText .final {
+  color: #ff7add;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes load {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 72%;
+  }
+}
+
+@media (max-width: 430px) {
+  .page {
+    padding: 14px;
+    align-items: center;
+  }
+
+  .card,
+  .letterCard {
+    width: 100%;
+    max-height: calc(100svh - 28px);
+    border-radius: 22px;
+    padding: 24px 18px;
+  }
+
+  .line {
+    font-size: 13px;
+  }
+
+  .letterText p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 390px) {
+  h1 {
+    font-size: clamp(28px, 9vw, 42px);
+  }
+
+  #unlockTitle {
+    font-size: clamp(22px, 7.4vw, 32px);
+  }
+
+  .text {
+    font-size: 15px;
+  }
 }
