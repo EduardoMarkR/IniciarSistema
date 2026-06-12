@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Screen =
   | "intro"
@@ -45,66 +45,77 @@ const fixLines = [
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("intro");
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  function playBeep(type: "start" | "error" | "success" = "start") {
-    const AudioContextClass =
-      window.AudioContext ||
-      (
-        window as typeof window & {
-          webkitAudioContext: typeof AudioContext;
-        }
-      ).webkitAudioContext;
+  const stopSound = useCallback(() => {
+    if (!currentAudioRef.current) return;
 
-    const audio = new AudioContextClass();
-    const oscillator = audio.createOscillator();
-    const gain = audio.createGain();
+    currentAudioRef.current.pause();
+    currentAudioRef.current.currentTime = 0;
+    currentAudioRef.current = null;
+  }, []);
 
-    oscillator.connect(gain);
-    gain.connect(audio.destination);
+  const playSound = useCallback(
+    (src: string, loop = false, volume = 0.45) => {
+      stopSound();
 
-    oscillator.frequency.value =
-      type === "error" ? 160 : type === "success" ? 660 : 420;
+      const audio = new Audio(src);
+      audio.loop = loop;
+      audio.volume = volume;
 
-    oscillator.type = "sine";
-    gain.gain.value = 0.045;
+      audio.play().catch(() => {
+        console.log("Som bloqueado pelo navegador até a próxima interação.");
+      });
 
-    oscillator.start();
-
-    setTimeout(
-      () => {
-        oscillator.stop();
-        audio.close();
-      },
-      type === "error" ? 260 : 150
-    );
-  }
+      currentAudioRef.current = audio;
+    },
+    [stopSound]
+  );
 
   useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+
     if (screen === "loading") {
-      const timer = setTimeout(() => setScreen("analysis"), 9000);
-      return () => clearTimeout(timer);
+      playSound("/sounds/typing.mp3", true, 0.25);
+      timer = setTimeout(() => setScreen("analysis"), 9000);
     }
 
     if (screen === "analysis") {
-      const timer = setTimeout(() => setScreen("error"), 14500);
-      return () => clearTimeout(timer);
+      playSound("/sounds/scan.mp3", true, 0.28);
+      timer = setTimeout(() => setScreen("error"), 14500);
     }
 
     if (screen === "error") {
-      const timer = setTimeout(() => setScreen("fix"), 5200);
-      return () => clearTimeout(timer);
+      playSound("/sounds/alert.mp3", false, 0.65);
+      timer = setTimeout(() => setScreen("fix"), 5200);
+    }
+
+    if (screen === "fix") {
+      playSound("/sounds/love.mp3", false, 0.55);
     }
 
     if (screen === "result") {
-      const timer = setTimeout(() => setScreen("memory"), 9500);
-      return () => clearTimeout(timer);
+      playSound("/sounds/fail.mp3", true, 0.38);
+      timer = setTimeout(() => setScreen("memory"), 9500);
     }
 
     if (screen === "memory") {
-      const timer = setTimeout(() => setScreen("unlock"), 5600);
-      return () => clearTimeout(timer);
+      playSound("/sounds/scan.mp3", true, 0.25);
+      timer = setTimeout(() => setScreen("unlock"), 5600);
     }
-  }, [screen]);
+
+    if (screen === "unlock") {
+      playSound("/sounds/unlock.mp3", false, 0.6);
+    }
+
+    if (screen === "letter") {
+      playSound("/sounds/love.mp3", true, 0.18);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [screen, playSound]);
 
   return (
     <main
@@ -119,9 +130,7 @@ export default function Home() {
       {screen === "intro" && (
         <section className="card center">
           <p className="tag">♥ TRANSMISSÃO CONFIDENCIAL ♥</p>
-
           <h1>AVI OS</h1>
-
           <p className="version">v1.0</p>
 
           <p className="text">
@@ -131,8 +140,8 @@ export default function Home() {
 
           <button
             onClick={() => {
-              playBeep("start");
-              setScreen("loading");
+              playSound("/sounds/startup.mp3", false, 0.55);
+              setTimeout(() => setScreen("loading"), 600);
             }}
           >
             INICIAR SISTEMA
@@ -199,17 +208,9 @@ export default function Home() {
           <p className="tag red">ERRO DETECTADO</p>
 
           <h2>Motivo encontrado:</h2>
-
           <h1 className="love">EDUARDO ESTÁ APAIXONADO.</h1>
 
-          <button
-            onClick={() => {
-              playBeep("error");
-              setScreen("result");
-            }}
-          >
-            CORRIGIR ERRO
-          </button>
+          <button onClick={() => setScreen("result")}>CORRIGIR ERRO</button>
         </section>
       )}
 
@@ -260,14 +261,7 @@ export default function Home() {
             Aqui está algo que eu precisava guardar só pra você. 💌
           </p>
 
-          <button
-            onClick={() => {
-              playBeep("success");
-              setScreen("letter");
-            }}
-          >
-            LER CARTA
-          </button>
+          <button onClick={() => setScreen("letter")}>LER CARTA</button>
         </section>
       )}
 
